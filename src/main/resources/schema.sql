@@ -1,5 +1,16 @@
--- This is where your DML goes
-create table remove_this(
-	id int not null auto_increment primary key,
-	name varchar(20)
+CREATE TABLE IF NOT EXISTS EMPLOYEE(
+	ID int AUTO_INCREMENT not null PRIMARY KEY,
+	NAME varchar(255) not null
+);
+
+CREATE TABLE IF NOT EXISTS TASK(
+	ID int not null AUTO_INCREMENT PRIMARY KEY,
+	DESCRIPTION varchar(255) not null,
+	DUE_DATE DATE,
+	STATUS varchar(255) not null,
+	EMPLOYEE_ID int,
+	
+	constraint FK_EMPLOYEE_TASK_OWNER
+		foreign key(EMPLOYEE_ID)
+		references EMPLOYEE(ID)
 );
