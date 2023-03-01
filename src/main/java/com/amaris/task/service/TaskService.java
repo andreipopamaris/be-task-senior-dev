@@ -35,7 +35,7 @@ public class TaskService {
                         throw new TaskManagerException(errorCode.getHttpStatus(), errorCode.getErrorCode(), errorCode.getMessage() + taskDto.getId() + " is found");
                     } else if (throwable.getMessage().contains("Referential integrity constraint violation")) {
                         TaskManagerErrorCode errorCode = TaskManagerErrorCode.REFERENTIAL_INTEGRITY_CONSTRAINT;
-                        throw new TaskManagerException(errorCode.getHttpStatus(), errorCode.getErrorCode(), errorCode.getMessage() + taskDto.getAssignee() + " is found");
+                        throw new TaskManagerException(errorCode.getHttpStatus(), errorCode.getErrorCode(), errorCode.getMessage() + taskDto.getAssignee() + " exists");
                     } else {
                         throw new TaskManagerException(HttpStatus.INTERNAL_SERVER_ERROR, "ERR-CUS-002", throwable.getMessage());
                     }
@@ -57,7 +57,7 @@ public class TaskService {
                         TaskManagerErrorCode errorCode = TaskManagerErrorCode.REFERENTIAL_INTEGRITY_CONSTRAINT;
                         throw new TaskManagerException(
                                 errorCode.getHttpStatus(), errorCode.getErrorCode(),
-                                errorCode.getMessage() + taskDto.getAssignee() + " is found");
+                                errorCode.getMessage() + taskDto.getAssignee() + " exist");
                     } else {
                         throw new TaskManagerException(HttpStatus.INTERNAL_SERVER_ERROR, "ERR-CUS-003", throwable.getMessage());
                     }

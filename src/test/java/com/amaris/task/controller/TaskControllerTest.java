@@ -176,7 +176,7 @@ public class TaskControllerTest extends CommonServiceOps {
                 .expectStatus().isBadRequest()
                 .expectBody(ResponseModel.class)
                 .value(res -> {
-                    assertEquals(TaskManagerErrorCode.REFERENTIAL_INTEGRITY_CONSTRAINT.getMessage() + "9 is found", res.getErrors().getMessage());
+                    assertEquals(TaskManagerErrorCode.REFERENTIAL_INTEGRITY_CONSTRAINT.getMessage() + "9 exist", res.getErrors().getMessage());
                 });
     }
 
