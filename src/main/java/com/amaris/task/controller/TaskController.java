@@ -1,19 +1,20 @@
 package com.amaris.task.controller;
 
-import com.amaris.task.common.ResponseModel;
-import com.amaris.task.common.ResponseStatus;
+import com.amaris.task.common.response.ResponseModel;
+import com.amaris.task.common.response.ResponseStatus;
+import com.amaris.task.dto.TaskDto;
+import com.amaris.task.entity.Status;
 import com.amaris.task.entity.Task;
+import com.amaris.task.exception.TaskManagerErrorCode;
 import com.amaris.task.exception.TaskManagerException;
 import com.amaris.task.service.TaskService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/task")
@@ -26,71 +27,130 @@ public class TaskController {
     }
 
     @PostMapping("/assign")
-    public Mono<ResponseEntity<ResponseModel<Task>>> assignTask(@Valid @RequestBody Task task) {
-        return this.taskService.manageTask(Task.builder()
-                .description(task.getDescription())
-                .dueDate(task.getDueDate())
-                .assignee(task.getAssignee())
+    public Mono<ResponseEntity<ResponseModel<TaskDto>>> assignTask(@Valid @RequestBody TaskDto taskDto) {
+
+        return this.taskService.assignTask(TaskDto.builder()
+                .description(taskDto.getDescription())
+                .dueDate(taskDto.getDueDate())
+                .assignee(taskDto.getAssignee())
+                .status(Status.ASSIGNED)
                 .build()).flatMap(tsk -> {
 
-            ResponseModel<Task> responseModel = new ResponseModel<>();
+            ResponseModel<TaskDto> responseModel = new ResponseModel<>();
             responseModel.setStatus(ResponseStatus.OK);
-            responseModel.setPayload(Collections.singletonList(tsk));
-            responseModel.setErrors("");
+            responseModel.setPayload(Collections.singletonList(TaskDto.builder()
+                    .id(tsk.getId())
+                    .description(tsk.getDescription())
+                    .dueDate(tsk.getDueDate())
+                    .assignee(tsk.getAssignee())
+                    .status(tsk.getStatus())
+                    .build()));
+            responseModel.setErrors(null);
 
             return Mono.just(ResponseEntity.ok(responseModel));
         });
     }
 
-    @PutMapping("/edit")
-    public Mono<ResponseEntity<ResponseModel<Task>>> editTask(@Valid @RequestBody Task task) {
-        return manageTask(task).flatMap(Mono::just);
+    @PutMapping("/unassign")
+    public Mono<ResponseEntity<ResponseModel<TaskDto>>> unassign(@Valid @RequestBody TaskDto taskDto) {
+        return manageTask(taskDto, Status.UNASSIGNED).flatMap(Mono::just);
     }
 
-    public Mono<ResponseEntity<ResponseModel<Task>>> manageTask(Task task) {
-        return this.taskService.updateTask(Task.builder()
-                .id(task.getId())
-                .description(task.getDescription())
-                .dueDate(task.getDueDate())
-                .assignee(task.getAssignee())
+    @PutMapping("/reassign")
+    public Mono<ResponseEntity<ResponseModel<TaskDto>>> reassign(@Valid @RequestBody TaskDto taskDto) {
+        return manageTask(taskDto, Status.ASSIGNED).flatMap(Mono::just);
+    }
+
+    @PutMapping("/edit")
+    public Mono<ResponseEntity<ResponseModel<TaskDto>>> updateDueDate(@Valid @RequestBody TaskDto taskDto) {
+        return manageTask(taskDto, Status.ASSIGNED).flatMap(Mono::just);
+    }
+
+    public Mono<ResponseEntity<ResponseModel<TaskDto>>> manageTask(TaskDto taskDto, Status status) {
+
+        if (Objects.isNull(taskDto.getId())) {
+            TaskManagerErrorCode errorCode = TaskManagerErrorCode.TASK_ID_IS_MANDATORY;
+            throw new TaskManagerException(errorCode.getHttpStatus(), errorCode.getErrorCode(), errorCode.getMessage());
+        }
+
+        return this.taskService.updateTask(TaskDto.builder()
+                .id(taskDto.getId())
+                .description(taskDto.getDescription())
+                .dueDate(taskDto.getDueDate())
+                .assignee(taskDto.getAssignee())
+                .status(status)
                 .build()).flatMap(tsk -> {
 
-            ResponseModel<Task> responseModel = new ResponseModel<>();
+            ResponseModel<TaskDto> responseModel = new ResponseModel<>();
             responseModel.setStatus(ResponseStatus.OK);
-            responseModel.setPayload(Collections.singletonList(tsk));
-            responseModel.setErrors("");
+
+            responseModel.setPayload(Collections.singletonList(TaskDto.builder()
+                    .id(tsk.getId())
+                    .description(tsk.getDescription())
+                    .dueDate(tsk.getDueDate())
+                    .assignee(tsk.getAssignee())
+                    .status(tsk.getStatus())
+                    .build()));
+
+            responseModel.setErrors(null);
 
             return Mono.just(ResponseEntity.ok(responseModel));
-        }).onErrorResume(throwable -> {
-            throw new TaskManagerException(HttpStatus.BAD_REQUEST, throwable.getMessage());
         });
     }
 
     @GetMapping("/all")
-    public Mono<ResponseEntity<ResponseModel<Task>>> getAllTask() {
+    public Mono<ResponseEntity<ResponseModel<TaskDto>>> getAllTask() {
         return this.taskService.getAllTasks().flatMap(Flux::just).collectList().flatMap(allTask -> {
-            ResponseModel<Task> responseModel = new ResponseModel<>();
+
+            if (Objects.isNull(allTask.get(0).getId())) {
+                TaskManagerErrorCode errorCode = TaskManagerErrorCode.NO_TASK_FOUND;
+                throw new TaskManagerException(errorCode.getHttpStatus(), errorCode.getErrorCode(), errorCode.getMessage());
+            }
+
+            List<TaskDto> taskDtoList = new ArrayList<>();
+            for (Task tsk : allTask) {
+                TaskDto taskDto = new TaskDto();
+                taskDto.setId(tsk.getId());
+                taskDto.setDescription(tsk.getDescription());
+                taskDto.setDueDate(tsk.getDueDate());
+                taskDto.setAssignee(tsk.getAssignee());
+                taskDto.setStatus(tsk.getStatus());
+                taskDtoList.add(taskDto);
+            }
+
+            ResponseModel<TaskDto> responseModel = new ResponseModel<>();
             responseModel.setStatus(ResponseStatus.OK);
-            responseModel.setPayload(allTask);
-            responseModel.setErrors("");
+            responseModel.setPayload(taskDtoList);
+            responseModel.setErrors(null);
 
             return Mono.just(ResponseEntity.ok(responseModel));
-        }).onErrorResume(throwable -> {
-            throw new TaskManagerException(HttpStatus.BAD_REQUEST, throwable.getMessage());
         });
     }
 
     @GetMapping("/{taskId}")
-    public Mono<ResponseEntity<ResponseModel<Task>>> getTaskById(@PathVariable("taskId") Integer taskId) {
-        return this.taskService.getTaskById(taskId).flatMap(task -> {
-            if (Objects.isNull(task.getId()) || Objects.isNull(task.getDescription())) {
-                throw new TaskManagerException(HttpStatus.NOT_FOUND, "No task is found with id equals :" + taskId);
+    public Mono<ResponseEntity<ResponseModel<TaskDto>>> getTaskById(@PathVariable("taskId") Integer taskId) {
+
+        if (Objects.isNull(taskId)) {
+            TaskManagerErrorCode errorCode = TaskManagerErrorCode.TASK_ID_IS_MANDATORY;
+            throw new TaskManagerException(errorCode.getHttpStatus(), errorCode.getErrorCode(), errorCode.getMessage());
+        }
+
+        return this.taskService.getTaskById(taskId).flatMap(taskDto -> {
+            if (Objects.isNull(taskDto.getId()) || Objects.isNull(taskDto.getDescription())) {
+                TaskManagerErrorCode errorCode = TaskManagerErrorCode.NO_TASK_IS_FOUND_BY_ID;
+                throw new TaskManagerException(errorCode.getHttpStatus(), errorCode.getErrorCode(), errorCode.getMessage() + taskId);
             }
 
-            ResponseModel<Task> responseModel = new ResponseModel<>();
+            ResponseModel<TaskDto> responseModel = new ResponseModel<>();
             responseModel.setStatus(ResponseStatus.OK);
-            responseModel.setPayload(Collections.singletonList(task));
-            responseModel.setErrors("");
+            responseModel.setPayload(Collections.singletonList(TaskDto.builder()
+                    .id(taskDto.getId())
+                    .description(taskDto.getDescription())
+                    .dueDate(taskDto.getDueDate())
+                    .assignee(taskDto.getAssignee())
+                    .status(taskDto.getStatus())
+                    .build()));
+            responseModel.setErrors(null);
 
             return Mono.just(ResponseEntity.ok(responseModel));
         });

@@ -1,24 +1,20 @@
-package com.amaris.task.entity;
+package com.amaris.task.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-@Entity
+
 @Data
 @Builder
 @AllArgsConstructor
-public class Employee {
+@NoArgsConstructor
+public class EmployeeDto {
 
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Id
-    @Column(name = "id")
-    @org.springframework.data.annotation.Id
     private Integer id;
-    @Column(name = "name")
     @NotNull(message = "Employee Name Must Not be Null!")
     private String name;
 }

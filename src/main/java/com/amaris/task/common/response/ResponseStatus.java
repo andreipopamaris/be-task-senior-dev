@@ -1,4 +1,4 @@
-package com.amaris.task.common;
+package com.amaris.task.common.response;
 
 import java.io.Serializable;
 

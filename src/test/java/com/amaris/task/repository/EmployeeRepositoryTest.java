@@ -34,7 +34,7 @@ public class EmployeeRepositoryTest extends CommonRepositoryOps {
     @Test
     public void getEmployeeById() {
 
-        Employee employee = new Employee(2, "Henok");
+        Employee employee = new Employee(2, "Employee One");
 
         StepVerifier.create(employeeRepository.findById(2)
                 .subscribeOn(Schedulers.parallel())).consumeNextWith(actual ->
@@ -47,10 +47,5 @@ public class EmployeeRepositoryTest extends CommonRepositoryOps {
         StepVerifier.create(employeeRepository.findById(1)
                 .subscribeOn(Schedulers.parallel()))
                 .expectNextCount(0).verifyComplete();
-/*        Assertions.assertThatExceptionOfType(AssertionError.class)
-                .isThrownBy(StepVerifier.create(employeeRepository.findById(1)
-                        .subscribeOn(Schedulers.parallel()))
-                        .expectError()::verify)
-                .withMessage("No employee found with id equals :" + 1);*/
     }
 }

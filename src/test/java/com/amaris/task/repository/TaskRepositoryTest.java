@@ -1,5 +1,6 @@
 package com.amaris.task.repository;
 
+import com.amaris.task.entity.Status;
 import com.amaris.task.entity.Task;
 import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -40,31 +41,18 @@ public class TaskRepositoryTest extends CommonRepositoryOps {
 
     @Test
     public void getTaskById() {
-        Task task = new Task(1, "Integrate software components and third-party programs", "27/02/2023", 2);
+        Task task = new Task(1,
+                "Task One",
+                String.valueOf("27/02/2023"),
+                2,
+                Status.ASSIGNED
+        );
 
         StepVerifier.create(taskRepository.findById(1)
                 .subscribeOn(Schedulers.parallel())).consumeNextWith(actual ->
                 assertEquals(actual, task)
         ).verifyComplete();
     }
-
-    /*@Test
-    public void updateTask() {
-        Task task = new Task(1, "Integrate software components only", "27/02/2023", 2);
-
-        taskRepository.deleteAll()
-                .thenMany(Flux.just(task))
-                .flatMap(taskRepository::save)
-                .doOnNext((tsk -> {
-                    logger.info("Inserted Task: " + tsk);
-                }))
-                .blockLast();
-
-        StepVerifier.create(taskRepository.findById(1)
-                .subscribeOn(Schedulers.parallel())).consumeNextWith(actual ->
-                assertEquals(actual, task)
-        ).verifyComplete();
-    }*/
 
     @Test
     public void findEmpByIdNotExist() {

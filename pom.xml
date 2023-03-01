@@ -12,7 +12,7 @@
     <artifactId>task</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Tasks</name>
-    <description>Simple task assignment with Spring Boot and React</description>
+    <description>Simple taskDto assignment with Spring Boot and React</description>
     <properties>
         <java.version>17</java.version>
     </properties>

@@ -8,5 +8,10 @@ create table task(
 	id BIGINT not null auto_increment primary key,
 	description varchar(500),
 	due_date varchar(20),
-	assignee BIGINT--can be used as FK
+	assignee BIGINT,
+	status varchar(10)
 );
+
+ALTER TABLE task
+    ADD FOREIGN KEY (assignee)
+    REFERENCES employee(id)

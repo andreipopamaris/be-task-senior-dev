@@ -1,4 +1,4 @@
-package com.amaris.task.common;
+package com.amaris.task.common.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +15,5 @@ import java.util.List;
 public class ResponseModel<T> implements Serializable {
     private ResponseStatus status;
     private List<T> payload;
-    private String errors;
+    private ErrorModel errors;
 }
