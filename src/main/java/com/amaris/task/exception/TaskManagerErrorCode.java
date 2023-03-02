@@ -26,7 +26,6 @@ public enum TaskManagerErrorCode {
     EMPLOYEE_NAME_MUST_NOT_NULL(HttpStatus.NOT_FOUND, "ERR-0012", "Employee Name Must Not be Null!"),
     NO_EMPLOYEE_FOUND(HttpStatus.NOT_FOUND, "ERR-0013", "No Employee Found");
 
-
     private HttpStatus httpStatus;
     private String errorCode;
     private String message;

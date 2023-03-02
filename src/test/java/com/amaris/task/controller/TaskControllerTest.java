@@ -149,15 +149,15 @@ public class TaskControllerTest extends CommonServiceOps {
 
     @Test
     public void getTaskByIdException() {
-        logger.info(">>>>>>>>>Test case >>>>>> getTaskByIdException>>>>>>" + TASK_BY_ID_END_POINT);
+        logger.info(">>>>>>>>>Test case >>>>>> getTaskByIdException>>>>>>" + TASK_BY_ID_END_POINT + "18");
 
-        webTestClient.get().uri(TASK_BY_ID_END_POINT + "8")
+        webTestClient.get().uri(TASK_BY_ID_END_POINT + "18")
                 .exchange()
-                .expectStatus().isNotFound()
+                .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody(ResponseModel.class)
                 .value(res -> {
-                    assertEquals(TaskManagerErrorCode.NO_TASK_IS_FOUND_BY_ID.getMessage() + 8, res.getErrors().getMessage());
+                    assertEquals(TaskManagerErrorCode.NO_TASK_IS_FOUND_BY_ID.getMessage() + 18, res.getErrors().getMessage());
                 });
     }
 

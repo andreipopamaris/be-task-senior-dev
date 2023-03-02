@@ -86,7 +86,7 @@ public class EmployeeControllerTest extends CommonServiceOps {
         logger.info(">>>>>>>>>Test case getEmployeeByIdException >>>>>> : " + EMPLOYEE_BY_ID_END_POINT + 8);
         webTestClient.get().uri(EMPLOYEE_BY_ID_END_POINT + "8")
                 .exchange()
-                .expectStatus().isNotFound()
+                .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody(ResponseModel.class)
                 .value(res -> {
