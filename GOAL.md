@@ -1,10 +1,10 @@
 ## Goals
 Create a web application that allows a manager to assign tasks to employees.
-All the objects involved in this task should be very simple. There is no 
+All the objects involved in this taskDto should be very simple. There is no 
 need to spend a lot of time thinking of complex scenarios.
 The objects you really need are the employees and the tasks. 
 The functionality that needs to be implemented is the assignment, unassignment and reassignment of
-tasks to the employees. Also, the user should have the possibility to change the due date of the task.
+tasks to the employees. Also, the user should have the possibility to change the due date of the taskDto.
 
 As a senior developer you are required to build the full stack of the 
 application, so we will be looking to find:
@@ -43,6 +43,6 @@ In order for this project to build and start you need:
 
 To allow the users of the application to:
 > * Assign, unassign and reassing tasks to employees
-> * Change the due date of a task
+> * Change the due date of a taskDto
 
 
